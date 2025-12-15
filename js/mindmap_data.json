@@ -1,0 +1,207 @@
+{
+  "name": "Root",
+  "type": "node",
+  "operator": "and",
+  "max_score": 100,
+  "enabled": true,
+  "children": [
+    {
+      "name": "Base sensor score",
+      "type": "node",
+      "operator": "and",
+      "max_score": 50,
+      "enabled": true,
+      "children": [
+        { "name": "CVSS", "type": "leaf", "weight": 8, "selected": false },
+        { "name": "EPSS", "type": "leaf", "weight": 1, "selected": false }
+      ]
+    },
+    {
+      "name": "Environmental",
+      "type": "node",
+      "operator": "and",
+      "max_score": 30,
+      "enabled": true,
+      "children": [
+        {
+          "name": "Mesures de protections",
+          "type": "node",
+          "operator": "or",
+          "max_score": 5,
+          "enabled": true,
+          "children": [
+            { "name": "High", "type": "leaf", "weight": 0, "selected": false },
+            { "name": "Medium", "type": "leaf", "weight": 2.5, "selected": false },
+            { "name": "Low", "type": "leaf", "weight": 5, "selected": false }
+          ]
+        },
+        {
+          "name": "Criticité des actifs",
+          "type": "node",
+          "operator": "and",
+          "max_score": 20,
+          "enabled": true,
+          "children": [
+            { 
+                "name": "Kind of data processed", 
+                "type": "node", 
+                "operator": "and",
+                "max_score": 15,
+                "enabled": true, 
+                "children": [
+                    { 
+                        "name": "Volume of data", 
+                        "type": "node", 
+                        "operator": "or",
+                        "max_score": 4,
+                        "enabled": true, 
+                        "children": [
+                            { "name": "Low", "type": "leaf", "weight": 0, "selected": false },
+                            { "name": "Medium", "type": "leaf", "weight": 2, "selected": false },
+                            { "name": "High", "type": "leaf", "weight": 4, "selected": false }
+                        ]
+                    },            
+                    { 
+                        "name": "Classification of data", 
+                        "type": "node", 
+                        "operator": "or",
+                        "max_score": 8,
+                        "enabled": true, 
+                        "children": [
+                            { "name": "Public", "type": "leaf", "weight": 0, "selected": false },
+                            { "name": "Internal", "type": "leaf", "weight": 2, "selected": false },
+                            { "name": "Restricted", "type": "leaf", "weight": 5, "selected": false },
+                            { "name": "Confidential", "type": "leaf", "weight": 8, "selected": false }
+                        ]
+                    },            
+                    { 
+                        "name": "Data regulations", 
+                        "type": "node", 
+                        "operator": "or",
+                        "max_score": 3,
+                        "enabled": true, 
+                        "children": [
+                            { "name": "No regulations", "type": "leaf", "weight": 0, "selected": false },
+                            { "name": "General/Specific regulations", "type": "leaf", "weight": 1.5, "selected": false },
+                            { "name": "Restrictive regulations (GDPR, AI ACT, HIPAA)", "type": "leaf", "weight": 3, "selected": false }
+                        ]
+                    }      
+                ]
+            },            
+            { 
+                "name": "Internet facing", 
+                "type": "node", 
+                "operator": "and",
+                "max_score": 5,
+                "enabled": true, 
+                "children": [
+                    { "name": "Internal", "type": "leaf", "weight": 0, "selected": false },
+                    {                
+                        "name": "External", 
+                        "type": "node", 
+                        "operator": "or",
+                        "max_score": 5,
+                        "enabled": true, 
+                        "children": [
+                            { "name": "User interactions", "type": "leaf", "weight": 5, "selected": false },
+                            { "name": "No user interactions", "type": "leaf", "weight": 2.5, "selected": false }
+                        ]
+                    }
+                ]
+            }
+          ]
+        },
+        {
+          "name": "Type d'environnement",
+          "type": "node",
+          "operator": "and",
+          "max_score": 5,
+          "enabled": true,
+          "children": [
+            { 
+                "name": "OT", 
+                "type": "node", 
+                "operator": "and",
+                "max_score": 5,
+                "enabled": true, 
+                "children": [
+                    { "name": "Effect on safety", "type": "leaf", "weight": 2.5, "selected": false },
+                    { "name": "Effect on environnement", "type": "leaf", "weight": 2.5, "selected": false }
+                ]
+            },
+            { "name": "IT", "type": "leaf", "weight": 0, "selected": false }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Intelligence",
+      "type": "node",
+      "operator": "and",
+      "max_score": 20,
+      "enabled": true,
+      "children": [
+        {
+          "name": "Exploit status \n (How available and known are the exploit of the vuln)",
+          "type": "node",
+          "operator": "or",
+          "max_score": 10,
+          "enabled": true,
+          "children": [
+            { "name": "in The Wild (CISA KEV)", "type": "leaf", "weight": 10, "selected": false },
+            { "name": "PoC + Pentester Framework or Toolkit", "type": "leaf", "weight": 7.5, "selected": false },
+            { "name": "PoC (but not verified)", "type": "leaf", "weight": 5, "selected": false },
+            { "name": "Discussion around PoC / Presumption of future PoC", "type": "leaf", "weight": 2.5, "selected": false },
+            { "name": "Nothing", "type": "leaf", "weight": 0, "selected": false }
+          ]
+        },
+        {
+          "name": "Threats",
+          "type": "node",
+          "operator": "and",
+          "max_score": 10,
+          "enabled": true,
+          "children": [
+            {                
+                "name": "Weaponization Level (How weaponized had this vuln been in known attacks", 
+                "type": "node", 
+                "operator": "and",
+                "max_score": 4,
+                "enabled": true, 
+                "children": [
+                    { "name": "vuln has been observed in cyberattack campaign", "type": "leaf", "weight": 1, "selected": false },
+                    { "name": "Group of attackers are known to have weaponized the vuln", "type": "leaf", "weight": 1, "selected": false },
+                    { "name": "PoC have been weaponized into known exploitations in specific systems", "type": "leaf", "weight": 1, "selected": false },
+                    { "name": "malware has been widely distributed in form of malicious software", "type": "leaf", "weight": 1, "selected": false }
+                ]
+            },
+            {                
+                "name": "Intensity (if the threat is popular among the domain of the company)", 
+                "type": "node", 
+                "operator": "or",
+                "max_score": 3,
+                "enabled": true, 
+                "children": [
+                    { "name": "High", "type": "leaf", "weight": 3, "selected": false },
+                    { "name": "Medium", "type": "leaf", "weight": 2, "selected": false },
+                    { "name": "Low", "type": "leaf", "weight": 1, "selected": false },
+                    { "name": "None", "type": "leaf", "weight": 0, "selected": false }
+                ]
+            },                    
+            {                
+                "name": "Zero day", 
+                "type": "node", 
+                "operator": "or",
+                "max_score": 3,
+                "enabled": true, 
+                "children": [
+                    { "name": "Yes", "type": "leaf", "weight": 3, "selected": false },
+                    { "name": "No", "type": "leaf", "weight": 0, "selected": false }
+                ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
