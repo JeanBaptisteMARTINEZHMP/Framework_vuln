@@ -23,6 +23,15 @@ const nodeToggleGroup = document.getElementById('nodeToggleGroup');
 const currentScore = document.getElementById('currentScore');
 const maxScore = document.getElementById('maxScore');
 
+// Initialize expanded state for progressive display
+function initializeExpandedState(node, depth = 0) {
+    node.id = Math.random().toString(36).substr(2, 9); // Add unique id
+    node.expanded = depth < 1; // Only root expanded by default
+    if (node.children) {
+        node.children.forEach(child => initializeExpandedState(child, depth + 1));
+    }
+}
+
 // Initialize the app
 function initApp() {
     // Initialize D3 mind map
@@ -74,7 +83,7 @@ function initializeMindMap() {
 
 // Build the mind map from JSON data
 function buildMindMap() {
-    // Convert the JSON data to a hierarchical structure for D3
+    // Use the full hierarchy
     const root = d3.hierarchy(mindMapData);
     
     // Create a tree layout with radial arrangement and increased spacing
@@ -85,61 +94,146 @@ function buildMindMap() {
     // Calculate the node positions
     treeLayout(root);
     
-    // Clear existing elements
-    g.selectAll(".link").remove();
-    g.selectAll(".node-group").remove();
-    
-    // Draw links
+    // Update existing elements or create new ones
+    updateLinks(root);
+    updateNodes(root);
+}
+
+// Check if a node is visible (all ancestors are expanded)
+function isNodeVisible(node) {
+    if (!node.parent) return true; // Root is always visible
+    return node.parent.data.expanded && isNodeVisible(node.parent);
+}
+
+// Update links
+function updateLinks(root) {
     const links = root.links();
+    
+    // Update existing links
     const link = g.selectAll(".link")
-        .data(links)
-        .enter().append("path")
-        .attr("class", d => isNodeEnabled(d.target.data) ? "link" : "link link-disabled")
-        .attr("d", d3.linkRadial()
-            .angle(d => d.x)
-            .radius(d => d.y));
+        .data(links, d => d.target.data.id)
+        .join(
+            enter => enter.append("path")
+                .attr("class", "link")
+                .attr("d", d3.linkRadial()
+                    .angle(d => d.x)
+                    .radius(d => d.y))
+                .style("opacity", d => isNodeVisible(d.target) ? 1 : 0),
+            update => update
+                .attr("d", d3.linkRadial()
+                    .angle(d => d.x)
+                    .radius(d => d.y))
+                .transition()
+                .duration(200)
+                .style("opacity", d => isNodeVisible(d.target) ? 1 : 0),
+            exit => exit
+                .transition()
+                .duration(200)
+                .style("opacity", 0)
+                .remove()
+        );
     
-    // Draw nodes
+    // Update link visibility and class
+    link
+        .attr("class", d => isNodeEnabled(d.target.data) && isNodeVisible(d.target) ? "link" : "link link-disabled");
+}
+
+// Update nodes
+function updateNodes(root) {
     const nodes = root.descendants();
+    
+    // Update existing nodes
     const nodeGroup = g.selectAll(".node-group")
-        .data(nodes)
-        .enter().append("g")
-        .attr("class", "node-group")
-        .attr("transform", d => `translate(${radialPoint(d.x, d.y)})`)
-        .on("contextmenu", (event, d) => {
-            event.preventDefault();
-            showNodeModal(d);
-        })
-        .on("click", (event, d) => {
-            event.stopPropagation();
-            if (d.data.type === "leaf") {
-                handleLeafClick(d);
-            }
-        });
-    
-    // Add circles to nodes
-    nodeGroup.append("circle")
-        .attr("class", "node-circle")
-        .attr("r", d => getNodeRadius(d))
-        .attr("fill", d => getNodeColor(d));
-    
-    // Add node labels
-    nodeGroup.append("text")
-        .attr("class", "node-label")
-        .attr("dy", d => -getNodeRadius(d) - 10)
-        .text(d => d.data.name);
-    
-    // Add node values/details inside the node
-    nodeGroup.append("text")
-        .attr("class", "node-value")
-        .attr("dy", 4)
-        .text(d => getNodeValue(d));
-    
-    // Add node operator/type
-    nodeGroup.append("text")
-        .attr("class", "node-details")
-        .attr("dy", d => getNodeRadius(d) + 15)
-        .text(d => getNodeDetails(d));
+        .data(nodes, d => d.data.id)
+        .join(
+            enter => {
+                const group = enter.append("g")
+                    .attr("class", "node-group")
+                    .attr("transform", d => `translate(${radialPoint(d.x, d.y)})`)
+                    .style("opacity", d => isNodeVisible(d) ? 1 : 0)
+                    .on("contextmenu", (event, d) => {
+                        event.preventDefault();
+                        showNodeModal(d);
+                    })
+                    .on("click", (event, d) => {
+                        event.stopPropagation();
+                        if (d.data.type === "leaf") {
+                            handleLeafClick(d);
+                        } else {
+                            // Toggle expansion for non-leaf nodes
+                            toggleNodeExpansion(d);
+                        }
+                    });
+                
+                // Add circles
+                group.append("circle")
+                    .attr("class", "node-circle")
+                    .attr("r", d => getNodeRadius(d))
+                    .attr("fill", d => getNodeColor(d));
+                
+                // Add labels
+                group.append("text")
+                    .attr("class", "node-label")
+                    .attr("dy", d => -getNodeRadius(d) - 10)
+                    .text(d => d.data.name);
+                
+                // Add values
+                group.append("text")
+                    .attr("class", "node-value")
+                    .attr("dy", 4)
+                    .text(d => getNodeValue(d));
+                
+                // Add details
+                group.append("text")
+                    .attr("class", "node-details")
+                    .attr("dy", d => getNodeRadius(d) + 15)
+                    .text(d => getNodeDetails(d));
+                
+                // Add expansion indicator
+                group.filter(d => d.data.children && d.data.children.length > 0)
+                    .append("text")
+                    .attr("class", "expansion-indicator")
+                    .attr("x", d => getNodeRadius(d) + 20)
+                    .attr("y", -5)
+                    .attr("text-anchor", "middle")
+                    .attr("font-size", "16px")
+                    .attr("fill", d => d.data.expanded ? "var(--node-disabled)" : "var(--node-color)")
+                    .style("font-weight", "bold")
+                    .style("pointer-events", "none")
+                    .text(d => d.data.expanded ? "−" : "+");
+                
+                return group;
+            },
+            update => {
+                update.transition()
+                    .duration(200)
+                    .style("opacity", d => isNodeVisible(d) ? 1 : 0)
+                    .attr("transform", d => `translate(${radialPoint(d.x, d.y)})`);
+                
+                update.select(".node-circle")
+                    .attr("fill", d => getNodeColor(d));
+                
+                update.select(".node-label")
+                    .text(d => d.data.name);
+                
+                update.select(".node-value")
+                    .text(d => getNodeValue(d));
+                
+                update.select(".node-details")
+                    .text(d => getNodeDetails(d));
+                
+                update.select(".expansion-indicator")
+                    .attr("fill", d => d.data.expanded ? "var(--node-disabled)" : "var(--node-color)")
+                    .text(d => d.data.expanded ? "−" : "+");
+                
+                return update;
+            },
+            exit => exit
+                .transition()
+                .duration(200)
+                .style("opacity", 0)
+                .remove()
+        );
 }
 
 // Check if a node is enabled (including parent status)
@@ -201,19 +295,24 @@ function getNodeDetails(d) {
 
 // Handle leaf click for selection
 function handleLeafClick(leafNode) {
+    // Find the original leaf node
+    const originalLeaf = findNodeById(mindMapData, leafNode.data.id);
+    // Find the original parent
+    const originalParent = findParentById(mindMapData, originalLeaf.id);
+    
+    if (!originalParent) return;
+    
     // Only allow selection if the parent node is enabled
-    if (!isNodeEnabled(leafNode.parent.data)) return;
+    if (!isNodeEnabled(originalParent)) return;
     
-    const parent = leafNode.parent;
-    
-    if (parent.data.operator === "and") {
+    if (originalParent.operator === "and") {
         // Toggle selection for AND operator
-        leafNode.data.selected = !leafNode.data.selected;
-    } else if (parent.data.operator === "or") {
+        originalLeaf.selected = !originalLeaf.selected;
+    } else if (originalParent.operator === "or") {
         // For OR operator, only one leaf can be selected
-        parent.children.forEach(child => {
-            if (child.data.type === "leaf") {
-                child.data.selected = (child === leafNode);
+        originalParent.children.forEach(child => {
+            if (child.type === "leaf") {
+                child.selected = (child === originalLeaf);
             }
         });
     }
@@ -223,6 +322,45 @@ function handleLeafClick(leafNode) {
     
     // Update the score display
     updateScoreDisplay();
+}
+
+// Toggle expansion of a node
+function toggleNodeExpansion(node) {
+    // Find the original node in mindMapData and toggle its expanded state
+    const originalNode = findNodeById(mindMapData, node.data.id);
+    if (originalNode && originalNode.children && originalNode.children.length > 0) {
+        originalNode.expanded = !originalNode.expanded;
+        // Rebuild the mind map to reflect changes
+        buildMindMap();
+    }
+}
+
+// Find a node in the data by its id
+function findNodeById(root, id) {
+    if (root.id === id) return root;
+    
+    if (root.children) {
+        for (const child of root.children) {
+            const found = findNodeById(child, id);
+            if (found) return found;
+        }
+    }
+    
+    return null;
+}
+
+// Find the parent of a node by the node's id
+function findParentById(root, id, parent = null) {
+    if (root.id === id) return parent;
+    
+    if (root.children) {
+        for (const child of root.children) {
+            const found = findParentById(child, id, root);
+            if (found) return found;
+        }
+    }
+    
+    return null;
 }
 
 // Show modal for editing node
@@ -394,12 +532,15 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .then(data => {
             mindMapData = data;
+            // Initialize expanded state
+            initializeExpandedState(mindMapData);
             initApp();
         })
         .catch(err => {
             console.error('Failed to load mind map JSON:', err);
             // Fallback: initialize with an empty structure to avoid crashes
             mindMapData = { name: 'Root', type: 'node', operator: 'and', max_score: 100, enabled: true, children: [] };
+            initializeExpandedState(mindMapData);
             initApp();
         });
 });

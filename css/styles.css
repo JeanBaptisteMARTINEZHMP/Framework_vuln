@@ -360,6 +360,12 @@ input:checked + .toggle-slider:before {
     pointer-events: none;
 }
 
+.expansion-indicator {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    pointer-events: none;
+}
+
 .link {
     fill: none;
     stroke: var(--accent-primary);
