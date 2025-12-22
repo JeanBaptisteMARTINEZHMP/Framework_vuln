@@ -1,5 +1,5 @@
 
-const dist = -500
+const dist = -750
 
 // D3.js variables
 let svg, g, zoom;
@@ -135,7 +135,7 @@ function updateLinks(root) {
     
     // Update link visibility and class
     link
-        .attr("class", d => isNodeEnabled(d.target.data) && isNodeVisible(d.target) ? "link" : "link link-disabled");
+        .attr("class", d => isNodeOrAncestorEnabled(d.target) && isNodeVisible(d.target) ? "link" : "link link-disabled");
 }
 
 // Update nodes
@@ -245,6 +245,13 @@ function isNodeEnabled(nodeData) {
     return nodeData.enabled;
 }
 
+// Check if a node or any of its ancestors is disabled
+function isNodeOrAncestorEnabled(node) {
+    if (!node) return true;
+    if (node.data.type !== "leaf" && !node.data.enabled) return false;
+    return isNodeOrAncestorEnabled(node.parent);
+}
+
 // Convert radial coordinates to Cartesian
 function radialPoint(x, y) {
     return [y * Math.cos(x - Math.PI / 2), y * Math.sin(x - Math.PI / 2)];
@@ -264,9 +271,9 @@ function getNodeColor(d) {
             return "var(--node-selected)";
         }
         // Leaves are only selectable if their parent is enabled
-        return isNodeEnabled(d.parent.data) ? "var(--node-color)" : "var(--node-disabled)";
+        return isNodeOrAncestorEnabled(d.parent) ? "var(--node-color)" : "var(--node-disabled)";
     }
-    return d.data.enabled ? "var(--node-color)" : "var(--node-disabled)";
+    return isNodeOrAncestorEnabled(d) ? "var(--node-color)" : "var(--node-disabled)";
 }
 
 // Get node value text in "current/max" format
@@ -393,9 +400,9 @@ function updateToggleStatus() {
 function saveNodeChanges() {
     if (selectedNode) {
         if (selectedNode.data.type === "leaf") {
-            selectedNode.data.weight = parseInt(nodeWeight.value);
+            selectedNode.data.weight = parseFloat(nodeWeight.value);
         } else {
-            selectedNode.data.max_score = parseInt(nodeWeight.value);
+            selectedNode.data.max_score = parseFloat(nodeWeight.value);
             
             // When enabling a node, enable all its children nodes but not leaves
             if (nodeEnabled.checked) {
@@ -461,6 +468,21 @@ function updateScoreDisplay() {
 function calculateNodeScore(node) {
     if (node.type === "leaf") {
         return node.selected ? node.weight : 0;
+    }
+    
+    // Special calculation for "Base sensor score"
+    if (node.name === "Base sensor score" && node.children && node.children.length >= 2) {
+        const cvss = node.children.find(child => child.name === "CVSS");
+        const epss = node.children.find(child => child.name === "EPSS");
+        if (cvss && cvss.selected) {
+            const cvssScore = cvss.weight * 5;
+            if (epss && epss.selected) {
+                return Math.min(cvssScore * epss.weight, node.max_score || 0);
+            } else {
+                return Math.min(cvssScore, node.max_score || 0);
+            }
+        }
+        return 0;
     }
     
     let score = 0;
