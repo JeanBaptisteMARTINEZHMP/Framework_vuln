@@ -12,7 +12,7 @@
       "max_score": 50,
       "enabled": true,
       "children": [
-        { "name": "CVSS", "type": "leaf", "weight": 8, "selected": false },
+        { "name": "CVSS", "type": "leaf", "weight": 7, "selected": false },
         { "name": "EPSS", "type": "leaf", "weight": 1, "selected": false }
       ]
     },
@@ -24,7 +24,7 @@
       "enabled": true,
       "children": [
         {
-          "name": "Mesures de protections",
+          "name": "Protective measures",
           "type": "node",
           "operator": "or",
           "max_score": 5,
@@ -36,7 +36,7 @@
           ]
         },
         {
-          "name": "Criticité des actifs",
+          "name": "Asset criticality",
           "type": "node",
           "operator": "and",
           "max_score": 20,
@@ -53,39 +53,27 @@
                         "name": "Volume of data", 
                         "type": "node", 
                         "operator": "or",
-                        "max_score": 4,
+                        "max_score": 5,
                         "enabled": true, 
                         "children": [
                             { "name": "Low", "type": "leaf", "weight": 0, "selected": false },
-                            { "name": "Medium", "type": "leaf", "weight": 2, "selected": false },
-                            { "name": "High", "type": "leaf", "weight": 4, "selected": false }
+                            { "name": "Medium", "type": "leaf", "weight": 2.5, "selected": false },
+                            { "name": "High", "type": "leaf", "weight": 5, "selected": false }
                         ]
                     },            
                     { 
                         "name": "Classification of data", 
                         "type": "node", 
                         "operator": "or",
-                        "max_score": 8,
+                        "max_score": 10,
                         "enabled": true, 
                         "children": [
                             { "name": "Public", "type": "leaf", "weight": 0, "selected": false },
-                            { "name": "Internal", "type": "leaf", "weight": 2, "selected": false },
-                            { "name": "Restricted", "type": "leaf", "weight": 5, "selected": false },
-                            { "name": "Confidential", "type": "leaf", "weight": 8, "selected": false }
+                            { "name": "Internal", "type": "leaf", "weight": 3, "selected": false },
+                            { "name": "Restricted", "type": "leaf", "weight": 7, "selected": false },
+                            { "name": "Confidential", "type": "leaf", "weight": 10, "selected": false }
                         ]
-                    },            
-                    { 
-                        "name": "Data regulations", 
-                        "type": "node", 
-                        "operator": "or",
-                        "max_score": 3,
-                        "enabled": true, 
-                        "children": [
-                            { "name": "No regulations", "type": "leaf", "weight": 0, "selected": false },
-                            { "name": "General/Specific regulations", "type": "leaf", "weight": 1.5, "selected": false },
-                            { "name": "Restrictive regulations (GDPR, AI ACT, HIPAA)", "type": "leaf", "weight": 3, "selected": false }
-                        ]
-                    }      
+                    }     
                 ]
             },            
             { 
@@ -103,8 +91,8 @@
                         "max_score": 5,
                         "enabled": true, 
                         "children": [
-                            { "name": "User interactions", "type": "leaf", "weight": 5, "selected": false },
-                            { "name": "No user interactions", "type": "leaf", "weight": 2.5, "selected": false }
+                            { "name": "User interactions", "type": "leaf", "weight": 2.5, "selected": false },
+                            { "name": "No user interactions", "type": "leaf", "weight": 5, "selected": false }
                         ]
                     }
                 ]
@@ -112,7 +100,7 @@
           ]
         },
         {
-          "name": "Type d'environnement",
+          "name": "Environment type",
           "type": "node",
           "operator": "and",
           "max_score": 5,
