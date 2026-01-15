@@ -1,9 +1,8 @@
-
+// distance between each node
 const dist = -750
 
 // D3.js variables
 let svg, g, zoom;
-let transform = d3.zoomIdentity;
 let selectedNode = null;
 var mindMapData = null;
 
@@ -75,7 +74,6 @@ function initializeMindMap() {
         .scaleExtent([0.1, 4])
         .on("zoom", (event) => {
             g.attr("transform", event.transform);
-            transform = event.transform;
         });
         
     svg.call(zoom);
