@@ -130,13 +130,13 @@
       "enabled": true,
       "children": [
         {
-          "name": "Exploit status \n (How available and known are the exploit of the vuln)",
+          "name": "Exploit status (How available and known are the exploit of the vuln)",
           "type": "node",
           "operator": "or",
           "max_score": 10,
           "enabled": true,
           "children": [
-            { "name": "in The Wild (CISA KEV)", "type": "leaf", "weight": 10, "selected": false },
+            { "name": "In The Wild (CISA KEV)", "type": "leaf", "weight": 10, "selected": false },
             { "name": "PoC + Pentester Framework or Toolkit", "type": "leaf", "weight": 7.5, "selected": false },
             { "name": "PoC (but not verified)", "type": "leaf", "weight": 5, "selected": false },
             { "name": "Discussion around PoC / Presumption of future PoC", "type": "leaf", "weight": 2.5, "selected": false },
@@ -151,16 +151,16 @@
           "enabled": true,
           "children": [
             {                
-                "name": "Weaponization Level (How weaponized had this vuln been in known attacks", 
+                "name": "Weaponization Level (How weaponized had this vuln been in known attacks)", 
                 "type": "node", 
                 "operator": "and",
                 "max_score": 4,
                 "enabled": true, 
                 "children": [
-                    { "name": "vuln has been observed in cyberattack campaign", "type": "leaf", "weight": 1, "selected": false },
+                    { "name": "Vuln has been observed in cyberattack campaign", "type": "leaf", "weight": 1, "selected": false },
                     { "name": "Group of attackers are known to have weaponized the vuln", "type": "leaf", "weight": 1, "selected": false },
                     { "name": "PoC have been weaponized into known exploitations in specific systems", "type": "leaf", "weight": 1, "selected": false },
-                    { "name": "malware has been widely distributed in form of malicious software", "type": "leaf", "weight": 1, "selected": false }
+                    { "name": "Malware has been widely distributed in form of malicious software", "type": "leaf", "weight": 1, "selected": false }
                 ]
             },
             {                

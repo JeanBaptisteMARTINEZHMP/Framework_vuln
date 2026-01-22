@@ -1,6 +1,6 @@
-# Mind Map Framework - Vulnerability Risk Assessment System
+# Vulnerability Prioritization Framework
 
-A powerful interactive web application for visualizing and assessing vulnerability risk using a hierarchical mind map framework. This tool provides a comprehensive scoring system to calculate risk levels based on technical factors, environmental conditions, and threat intelligence.
+An interactive web application for visualizing and prioritizing vulnerabilities based on client context and organizational factors. This tool provides a comprehensive scoring system to calculate risk levels and establish prioritization strategies across technical, environmental, and threat intelligence dimensions.
 
 **Authors:** Jean-Baptiste MARTINEZ & Noé PAQUIN  
 **Version:** 1.0  
@@ -20,17 +20,13 @@ A powerful interactive web application for visualizing and assessing vulnerabili
 
 ## Overview
 
-The **Mind Map Framework** is a vulnerability risk assessment tool that visualizes security vulnerabilities as an interactive hierarchical mind map. It calculates risk scores across three main dimensions:
+The **Vulnerability Prioritization Framework** is a context-aware vulnerability assessment tool that visualizes security vulnerabilities as an interactive hierarchical mind map. It calculates priority scores across three main dimensions to help organizations focus remediation efforts on the most critical vulnerabilities relative to their operational context:
 
 1. **Base Sensor Score** (50%) - Technical severity metrics (CVSS, EPSS)
-2. **Environmental** (30%) - Asset criticality and environmental factors
+2. **Environmental** (30%) - Asset criticality and organizational context
 3. **Intelligence** (20%) - Threat landscape and exploit availability
 
-The application uses **D3.js** for interactive visualization and provides a user-friendly interface to:
-- Expand/collapse nodes to explore different assessment levels
-- Select vulnerability characteristics through leaf nodes
-- Edit node weights and enable/disable assessment branches
-- View real-time risk score calculations (0-100 scale)
+The application uses **D3.js** for interactive visualization and provides a user-friendly interface.
 
 ---
 

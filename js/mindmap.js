@@ -1,5 +1,5 @@
 // distance between each node
-const dist = -750
+const dist = -800
 
 // D3.js variables
 let svg, g, zoom;
@@ -172,8 +172,26 @@ function updateNodes(root) {
                 // Add labels
                 group.append("text")
                     .attr("class", "node-label")
-                    .attr("dy", d => -getNodeRadius(d) - 10)
-                    .text(d => d.data.name);
+                    .attr("y", function(d) {
+                        const maxChars = d.depth === 0 ? 40 : 35;
+                        const lines = splitTextIntoLines(d.data.name, maxChars);
+                        const lineHeight = 14.4; // 12px * 1.2
+                        return -getNodeRadius(d) - 10 - (lines.length - 1) * lineHeight;
+                    })
+                    .attr("text-anchor", "middle")
+                    .attr("dominant-baseline", "text-bottom")
+                    .each(function(d) {
+                        const maxChars = d.depth === 0 ? 40 : 35;
+                        const lines = splitTextIntoLines(d.data.name, maxChars);
+                        const text = d3.select(this);
+                        
+                        lines.forEach((line, i) => {
+                            text.append("tspan")
+                                .attr("x", 0)
+                                .attr("dy", i === 0 ? 0 : "1.2em")
+                                .text(line);
+                        });
+                    });
                 
                 // Add values
                 group.append("text")
@@ -212,7 +230,25 @@ function updateNodes(root) {
                     .attr("fill", d => getNodeColor(d));
                 
                 update.select(".node-label")
-                    .text(d => d.data.name);
+                    .attr("y", function(d) {
+                        const maxChars = d.depth === 0 ? 40 : 35;
+                        const lines = splitTextIntoLines(d.data.name, maxChars);
+                        const lineHeight = 14.4; // 12px * 1.2
+                        return -getNodeRadius(d) - 10 - (lines.length - 1) * lineHeight;
+                    })
+                    .text(null)
+                    .each(function(d) {
+                        const maxChars = d.depth === 0 ? 40 : 35;
+                        const lines = splitTextIntoLines(d.data.name, maxChars);
+                        const text = d3.select(this);
+                        
+                        lines.forEach((line, i) => {
+                            text.append("tspan")
+                                .attr("x", 0)
+                                .attr("dy", i === 0 ? 0 : "1.2em")
+                                .text(line);
+                        });
+                    });
                 
                 update.select(".node-value")
                     .text(d => getNodeValue(d));
@@ -253,6 +289,24 @@ function isNodeOrAncestorEnabled(node) {
 // Convert radial coordinates to Cartesian
 function radialPoint(x, y) {
     return [y * Math.cos(x - Math.PI / 2), y * Math.sin(x - Math.PI / 2)];
+}
+
+// Split text into lines based on character limit
+function splitTextIntoLines(text, maxCharsPerLine) {
+    const words = text.split(/\s+/);
+    const lines = [];
+    let currentLine = '';
+
+    words.forEach(word => {
+        if ((currentLine + ' ' + word).trim().length > maxCharsPerLine) {
+            if (currentLine) lines.push(currentLine.trim());
+            currentLine = word;
+        } else {
+            currentLine = currentLine ? currentLine + ' ' + word : word;
+        }
+    });
+    if (currentLine) lines.push(currentLine.trim());
+    return lines;
 }
 
 // Get node radius based on depth and type
