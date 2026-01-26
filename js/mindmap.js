@@ -506,7 +506,7 @@ function disableNodeAndChildren(node) {
 // Calculate and update the score display
 function updateScoreDisplay() {
     // Calculate the current score and effective max score
-    const currentScoreValue = calculateScore(mindMapData);
+    const currentScoreValue = calculateNodeScore(mindMapData);
     const effectiveMaxScore = calculateEffectiveMaxScore(mindMapData);
     
     // Normalize the score to 100 based on effective max score
@@ -574,11 +574,6 @@ function calculateEffectiveMaxScore(node) {
 
     // Fallback: use node.max_score if present
     return node.max_score || 0;
-}
-
-// Recursively calculate the score based on selected leaves
-function calculateScore(node) {
-    return calculateNodeScore(node);
 }
 
 // Zoom functions

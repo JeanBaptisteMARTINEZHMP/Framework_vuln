@@ -49,29 +49,42 @@
                 "max_score": 15,
                 "enabled": true, 
                 "children": [
+                  { 
+                        "name": "Availability impact", 
+                        "type": "node", 
+                        "operator": "or",
+                        "max_score": 6,
+                        "enabled": true, 
+                        "children": [
+                            { "name": "Low", "type": "leaf", "weight": 0, "selected": false },
+                            { "name": "Medium", "type": "leaf", "weight": 2, "selected": false },
+                            { "name": "High", "type": "leaf", "weight": 4, "selected": false },
+                            { "name": "Critical", "type": "leaf", "weight": 6, "selected": false }
+                        ]
+                    },
                     { 
                         "name": "Volume of data", 
                         "type": "node", 
                         "operator": "or",
-                        "max_score": 5,
+                        "max_score": 3,
                         "enabled": true, 
                         "children": [
                             { "name": "Low", "type": "leaf", "weight": 0, "selected": false },
-                            { "name": "Medium", "type": "leaf", "weight": 2.5, "selected": false },
-                            { "name": "High", "type": "leaf", "weight": 5, "selected": false }
+                            { "name": "Medium", "type": "leaf", "weight": 1.5, "selected": false },
+                            { "name": "High", "type": "leaf", "weight": 3, "selected": false }
                         ]
                     },            
                     { 
                         "name": "Classification of data", 
                         "type": "node", 
                         "operator": "or",
-                        "max_score": 10,
+                        "max_score": 6,
                         "enabled": true, 
                         "children": [
                             { "name": "Public", "type": "leaf", "weight": 0, "selected": false },
-                            { "name": "Internal", "type": "leaf", "weight": 3, "selected": false },
-                            { "name": "Restricted", "type": "leaf", "weight": 7, "selected": false },
-                            { "name": "Confidential", "type": "leaf", "weight": 10, "selected": false }
+                            { "name": "Internal", "type": "leaf", "weight": 2, "selected": false },
+                            { "name": "Restricted", "type": "leaf", "weight": 4, "selected": false },
+                            { "name": "Confidential", "type": "leaf", "weight": 6, "selected": false }
                         ]
                     }     
                 ]
@@ -117,7 +130,7 @@
                     { "name": "Effect on environnement", "type": "leaf", "weight": 2.5, "selected": false }
                 ]
             },
-            { "name": "IT", "type": "leaf", "weight": 0, "selected": false }
+            { "name": "Product in run", "type": "leaf", "weight": 2, "selected": false }
           ]
         }
       ]
